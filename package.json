@@ -13,6 +13,8 @@
   "author": "Andrii Antonenko",
   "license": "ISC",
   "devDependencies": {
+    "@types/amqplib": "^0.5.13",
+    "@types/config": "0.0.36",
     "@types/node": "^13.7.0",
     "@types/tesseract.js": "0.0.2",
     "ts-node-dev": "^1.0.0-pre.44",
@@ -20,6 +22,8 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
+    "amqplib": "^0.5.5",
+    "config": "^3.2.5",
     "tesseract.js": "^2.0.2"
   }
 }

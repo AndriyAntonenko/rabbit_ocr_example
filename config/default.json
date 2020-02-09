@@ -1,0 +1,6 @@
+{
+  "rabitMQ": {
+    "url": "amqp://localhost",
+    "OCRqueue": "ocr"
+  }
+}
