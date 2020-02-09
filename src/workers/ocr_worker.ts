@@ -1,12 +1,16 @@
 import { parentPort } from 'worker_threads';
 import { createWorker } from 'tesseract.js';
 import { OCRChannel } from '../libs/channels/ocr.channel';
+import { ConsumeMessage } from 'amqplib';
 
-const worker = createWorker();
 const ocrChannel: OCRChannel = new OCRChannel();
 
 async function ocrProducing(url: string): Promise<string | Error> {
   try {
+    const worker = createWorker({
+      logger: m => console.log(m),
+    });
+
     await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
@@ -18,8 +22,15 @@ async function ocrProducing(url: string): Promise<string | Error> {
   }
 }
 
-(async() => {
-  const message: string = await ocrChannel.getFromQueue();
-  const text: any = await ocrProducing(message);
-  parentPort.postMessage(text);
-})();
+function handler(msg: ConsumeMessage) {
+  ocrProducing(msg.content.toString())
+  .then(text => {
+    parentPort.postMessage(text);
+  });
+}
+
+async function receive() {
+  await ocrChannel.getFromQueue(handler);
+}
+
+receive();

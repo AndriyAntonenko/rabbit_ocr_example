@@ -1,6 +1,6 @@
 import config from 'config';
 import { connection } from '../rebitmq';
-import { Channel, Connection } from 'amqplib';
+import { Channel, Connection, ConsumeMessage } from 'amqplib';
 
 export class OCRChannel {
   private readonly queueName: string;
@@ -18,15 +18,11 @@ export class OCRChannel {
     );
   }
 
-  public async getFromQueue(): Promise<string> {
+  public async getFromQueue(callback: (msg: ConsumeMessage) => void): Promise<any> {
     const ch: Channel = await this.getChannel();
     await ch.assertQueue(this.queueName);
 
-    return new Promise((resolve, reject) => {
-      ch.consume(this.queueName, (msg) => {
-        if (msg !== null) { return resolve(msg.content.toString()); }
-      });
-    });
+    return await ch.consume(this.queueName, callback, { noAck: true });
   }
 
   private async getChannel(): Promise<Channel> {
@@ -34,17 +30,3 @@ export class OCRChannel {
     return await conn.createChannel();
   }
 }
-
-// // Consumer
-// open.then(function(conn) {
-//   return conn.createChannel();
-// }).then(function(ch) {
-//   return ch.assertQueue(q).then(function(ok) {
-//     return ch.consume(q, function(msg) {
-//       if (msg !== null) {
-//         console.log(msg.content.toString());
-//         ch.ack(msg);
-//       }
-//     });
-//   });
-// }).catch(console.warn);

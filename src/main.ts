@@ -1,6 +1,8 @@
 import path from 'path';
 import { Worker } from 'worker_threads';
 import { OCRChannel } from './libs/channels/ocr.channel';
+import { Server } from 'ws';
+import { FileUrl } from './interfaces/file_url.interface';
 
 const ocrChannel: OCRChannel = new OCRChannel();
 
@@ -14,6 +16,19 @@ worker.on('message', (result) => {
   console.log(result);
 });
 
-(async() => {
-  await ocrChannel.push('https://previews.123rf.com/images/happyroman/happyroman1611/happyroman161100004/67968361-atm-transaction-printed-paper-receipt-bill-vector.jpg');
-})();
+const wss: Server = new Server({
+  port: 8080,
+});
+
+wss.on('connection', ws => {
+  console.log('Connected...');
+  ws.on('message', (message) => {
+    try {
+      const file: FileUrl = JSON.parse(message.toString());
+      console.log('Got new message:', file);
+      ocrChannel.push(file.fileUrl);
+    } catch (error) {
+      console.warn(error);
+    }
+  });
+});
