@@ -1,4 +1,5 @@
 {
+  "port": 8080,
   "rabitMQ": {
     "url": "amqp://localhost",
     "OCRqueue": "ocr"

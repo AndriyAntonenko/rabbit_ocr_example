@@ -1,14 +1,18 @@
-import config from 'config';
-import { connection } from '../rebitmq';
+import { inject, injectable } from 'inversify';
 import { Channel, Connection, ConsumeMessage } from 'amqplib';
+import { TYPES } from '../../constants/types';
 
+@injectable()
 export class OCRChannel {
   private readonly queueName: string;
-  private readonly connection: () => Promise<Connection>;
+  private readonly connection: Connection;
 
-  constructor() {
-    this.connection = connection;
-    this.queueName = config.get('rabitMQ.OCRqueue');
+  constructor(
+    @inject(TYPES.RabbitMQ) _connection: Connection,
+    @inject(TYPES.OCRQueue) _queueName: string,
+  ) {
+    this.connection = _connection;
+    this.queueName = _queueName;
   }
 
   public async push(msg: string): Promise<boolean> {
@@ -29,8 +33,7 @@ export class OCRChannel {
   }
 
   private async getChannel(): Promise<Channel> {
-    const conn: Connection = await this.connection();
-    const ch: Channel = await conn.createChannel();
+    const ch: Channel = await this.connection.createChannel();
     return ch;
   }
 }

@@ -1,13 +1,18 @@
+import { inject, injectable } from 'inversify';
 import { OCRChannel } from '../libs/channels/ocr.channel';
 import { FileUrl } from '../interfaces/file_url.interface';
 import { createWorker } from 'tesseract.js';
 import { ConsumeMessage, Channel } from 'amqplib';
+import { TYPES } from '../constants/types';
 
+@injectable()
 export class OCRService {
   private readonly ocrChannel: OCRChannel;
 
-  constructor() {
-    this.ocrChannel = new OCRChannel();
+  constructor(
+    @inject(TYPES.OCRChannel) _ocrChannel: OCRChannel,
+  ) {
+    this.ocrChannel = _ocrChannel;
   }
 
   public pushFile(message: string) {

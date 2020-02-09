@@ -1,13 +1,19 @@
-import { Server, MessageEvent } from 'ws';
+import { inject, injectable } from 'inversify';
+import { Server } from 'ws';
 import { OCRService } from './services/ocr.service';
+import { TYPES } from './constants/types';
 
+@injectable()
 export class WSServer {
   private readonly wss: Server;
   private readonly ocrService: OCRService;
 
-  constructor() {
-    this.wss = new Server({ port: 8080 });
-    this.ocrService = new OCRService();
+  constructor(
+    @inject(TYPES.WebSocketServer) _wss: Server,
+    @inject(TYPES.OCRService) _ocrService: OCRService,
+  ) {
+    this.wss = _wss;
+    this.ocrService = _ocrService;
   }
 
   public connection() {

@@ -24,7 +24,9 @@
   },
   "dependencies": {
     "amqplib": "^0.5.5",
-    "config": "^3.2.5", 
+    "config": "^3.2.5",
+    "inversify": "^5.0.1",
+    "reflect-metadata": "^0.1.13",
     "tesseract.js": "^2.0.2",
     "ws": "^7.2.1"
   }
