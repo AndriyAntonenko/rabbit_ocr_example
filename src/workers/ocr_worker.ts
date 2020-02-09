@@ -1,36 +1,26 @@
 import { parentPort } from 'worker_threads';
-import { createWorker } from 'tesseract.js';
 import { OCRChannel } from '../libs/channels/ocr.channel';
-import { ConsumeMessage } from 'amqplib';
+import { ConsumeMessage, Channel } from 'amqplib';
+import { OCRService } from '../services/ocr.service';
 
-const ocrChannel: OCRChannel = new OCRChannel();
+class OCRWorker {
+  private readonly ocrChannel: OCRChannel = new OCRChannel();
+  private readonly ocrService: OCRService = new OCRService();
 
-async function ocrProducing(url: string): Promise<string | Error> {
-  try {
-    const worker = createWorker({
-      logger: m => console.log(m),
-    });
+  public handler(msg: ConsumeMessage, ch: Channel) {
+    console.log('====> NEW IMAGE!!!');
+    console.log(this.ocrService);
 
-    await worker.load();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    const { data: { text } } = await worker.recognize(url);
-    await worker.terminate();
-    return text;
-  } catch (error) {
-    return error;
+    this.ocrService.ocrProducing(msg.content.toString())
+      .then(text => {
+        parentPort.postMessage(text);
+        ch.ack(msg);
+      });
+  }
+
+  public async receive() {
+    await this.ocrChannel.getFromQueue((msg, ch) => this.handler(msg, ch));
   }
 }
 
-function handler(msg: ConsumeMessage) {
-  ocrProducing(msg.content.toString())
-  .then(text => {
-    parentPort.postMessage(text);
-  });
-}
-
-async function receive() {
-  await ocrChannel.getFromQueue(handler);
-}
-
-receive();
+new OCRWorker().receive();

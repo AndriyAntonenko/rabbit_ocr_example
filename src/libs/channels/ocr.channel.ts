@@ -13,20 +13,24 @@ export class OCRChannel {
 
   public async push(msg: string): Promise<boolean> {
     const ch: Channel = await this.getChannel();
-    return ch.assertQueue(this.queueName).then((ok) =>
-      ch.sendToQueue(this.queueName, Buffer.from(msg))
+    return ch.assertQueue(this.queueName, { durable: true }).then((ok) =>
+      ch.sendToQueue(this.queueName, Buffer.from(msg), { persistent: true })
     );
   }
 
-  public async getFromQueue(callback: (msg: ConsumeMessage) => void): Promise<any> {
+  public async getFromQueue(callback: (msg: ConsumeMessage, ch: Channel) => void): Promise<any> {
     const ch: Channel = await this.getChannel();
-    await ch.assertQueue(this.queueName);
+    ch.prefetch(1);
+    await ch.assertQueue(this.queueName, { durable: true });
 
-    return await ch.consume(this.queueName, callback, { noAck: true });
+    return await ch.consume(this.queueName, (msg) => {
+      callback(msg, ch);
+    }, { noAck: false });
   }
 
   private async getChannel(): Promise<Channel> {
     const conn: Connection = await this.connection();
-    return await conn.createChannel();
+    const ch: Channel = await conn.createChannel();
+    return ch;
   }
 }
