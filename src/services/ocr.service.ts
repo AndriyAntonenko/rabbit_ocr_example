@@ -1,6 +1,7 @@
 import { OCRChannel } from '../libs/channels/ocr.channel';
 import { FileUrl } from '../interfaces/file_url.interface';
 import { createWorker } from 'tesseract.js';
+import { ConsumeMessage, Channel } from 'amqplib';
 
 export class OCRService {
   private readonly ocrChannel: OCRChannel;
@@ -21,20 +22,19 @@ export class OCRService {
 
   public async ocrProducing(url: string): Promise<string | Error> {
     try {
-      const worker = createWorker({
-        logger: m => console.log(m)
-      });
+      const worker = createWorker();
       await worker.load();
-      console.log('1');
       await worker.loadLanguage('eng');
-      console.log('2');
       await worker.initialize('eng');
-      console.log('3');
       const { data: { text } } = await worker.recognize(url);
       await worker.terminate();
       return text;
     } catch (error) {
       return error;
     }
+  }
+
+  public async receive(handler: (msg: ConsumeMessage, ch: Channel) => void) {
+    await this.ocrChannel.getFromQueue((msg, ch) => handler(msg, ch));
   }
 }

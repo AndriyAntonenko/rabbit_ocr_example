@@ -5,7 +5,7 @@ import { WSServer } from './ws.server';
 
 const worker = new Worker(path.resolve(__dirname, './worker.import.js'), {
   workerData: {
-    path: './workers/ocr_worker.ts'
+    path: './workers/ocr.worker.ts'
   }
 });
 
