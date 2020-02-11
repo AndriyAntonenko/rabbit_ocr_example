@@ -1,0 +1,20 @@
+version: "3"
+ 
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      RABBIT_URL: amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+      
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
