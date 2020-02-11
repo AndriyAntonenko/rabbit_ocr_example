@@ -18,7 +18,9 @@ export class OCRService {
   public pushFile(message: string) {
     try {
       const file: FileUrl = JSON.parse(message);
+
       console.log('Got new message:', file);
+      if (!file.fileUrl) { throw new Error('Wrong request format...'); }
       this.ocrChannel.push(file.fileUrl);
     } catch (error) {
       console.warn(error);
