@@ -30,5 +30,6 @@ export class WSServer {
 
   private onError(error: Error) {
     console.error(`WebSocket error: ${error}`);
+    process.exit(1);
   }
 }
