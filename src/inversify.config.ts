@@ -8,7 +8,7 @@ import { OCRService } from './services/ocr.service';
 import { WSServer } from './ws.server';
 import { Server } from 'ws';
 
-import { connection } from './libs/rebitmq';
+import { connection } from './libs/rabbitmq';
 
 export const bindings = new AsyncContainerModule(async(bind: interfaces.Bind) => {
   const conn: Connection = await connection();
