@@ -1,11 +1,12 @@
 /// <reference types="jest" />
 import 'reflect-metadata';
 import { Container } from 'inversify';
-import { Server } from 'ws';
 
 import { bindings } from '../inversify.config';
 import { TYPES } from '../constants/types';
-import { WSServer } from '../ws.server';
+import { ImageUrlValidator } from '../validators/image_url.validator';
+
+import { fixtures } from './fixtures/index';
 
 const container: Container = new Container();
 beforeAll(async() => {
@@ -15,10 +16,10 @@ beforeAll(async() => {
 beforeEach(() => { jest.setTimeout(100000); });
 
 describe('WS Server', () => {
-  test('Connection handler', () => {
-    const wsServer: WSServer = container.get<WSServer>(TYPES.WSServer);
-    const wss: Server = wsServer.connection();
+  test('Test correct data', async() => {
+    const validator: ImageUrlValidator = container.get<ImageUrlValidator>(TYPES.ImageUrlValidator);
+    const url: string = await validator.validate(fixtures.ocrProcesing.url);
 
-    expect(wss).toBeInstanceOf(Server);
+    expect(url).toBe(fixtures.ocrProcesing.url);
   });
 });
