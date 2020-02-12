@@ -6,10 +6,7 @@ import { bindings } from './inversify.config';
 import { WSServer } from './ws.server';
 import { TYPES} from './constants/types';
 
-(async() => {
-  const container: Container = new Container();
-  await container.loadAsync(bindings);
-
+function runOCRWorker() {
   const worker = new Worker(path.resolve(__dirname, './worker.import.js'), {
     workerData: {
       path: './workers/ocr.worker.ts'
@@ -19,6 +16,18 @@ import { TYPES} from './constants/types';
   worker.on('message', (result) => {
     console.log(result);
   });
+
+  worker.on('error', (err) => {
+    console.log('Worker error:', err);
+    runOCRWorker();
+  });
+}
+
+(async() => {
+  const container: Container = new Container();
+  await container.loadAsync(bindings);
+
+  runOCRWorker();
 
   container.get<WSServer>(TYPES.WSServer).connection();
 })();
