@@ -7,4 +7,7 @@ export const TYPES = {
   RabbitMQ: Symbol.for('RabbitMQ'),
   OCRQueue: Symbol.for('OCRQueue'),
   TesseractWorker: Symbol.for('TesseractWorker'),
+
+  ImageUrlValidator: Symbol.for('ImageUrlValidator'),
+  Axios: Symbol.for('Axios')
 };

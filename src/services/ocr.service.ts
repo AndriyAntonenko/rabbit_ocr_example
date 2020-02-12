@@ -4,18 +4,22 @@ import { FileUrl } from '../interfaces/file_url.interface';
 import { Worker } from 'tesseract.js';
 import { ConsumeMessage, Channel } from 'amqplib';
 import { TYPES } from '../constants/types';
+import { ImageUrlValidator } from '../validators/image_url.validator';
 
 @injectable()
 export class OCRService {
   private readonly ocrChannel: OCRChannel;
   private readonly newWorker: () => Worker;
+  private readonly urlValidator: ImageUrlValidator;
 
   constructor(
     @inject(TYPES.OCRChannel) _ocrChannel: OCRChannel,
     @inject(TYPES.TesseractWorker) _tesseractWorker: () => Worker,
+    @inject(TYPES.ImageUrlValidator) _urlValidator: ImageUrlValidator,
   ) {
     this.ocrChannel = _ocrChannel;
     this.newWorker = _tesseractWorker;
+    this.urlValidator = _urlValidator;
   }
 
   public pushFile(message: string) {
@@ -32,6 +36,7 @@ export class OCRService {
 
   public async ocrProducing(url: string): Promise<string | Error> {
     try {
+      await this.urlValidator.validate(url);
       const tesseractWorker: Worker = this.newWorker();
       await tesseractWorker.load();
       await tesseractWorker.loadLanguage('eng');

@@ -2,8 +2,11 @@ import config from 'config';
 import { Connection } from 'amqplib';
 import { createWorker, Worker } from 'tesseract.js';
 import { AsyncContainerModule, interfaces } from 'inversify';
+import axios, { AxiosStatic } from 'axios';
 import { TYPES } from './constants/types';
 
+import { Validator } from './interfaces/validator.interface';
+import { ImageUrlValidator } from './validators/image_url.validator';
 import { OCRChannel } from './libs/channels/ocr.channel';
 import { OCRService } from './services/ocr.service';
 import { WSServer } from './ws.server';
@@ -26,7 +29,8 @@ export const bindings = new AsyncContainerModule(async(bind: interfaces.Bind) =>
   bind<interfaces.Factory<Worker>>(TYPES.TesseractWorker).toFactory<Worker>((context: interfaces.Context) => {
     return () => createWorker();
   });
-
+  bind<Validator>(TYPES.ImageUrlValidator).to(ImageUrlValidator);
+  bind<AxiosStatic>(TYPES.Axios).toDynamicValue(() => axios);
   /**
    * Constants
    */
