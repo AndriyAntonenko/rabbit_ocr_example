@@ -12,6 +12,8 @@ services:
       - rabbitmq
     links: 
       - rabbitmq
+    user: node
+    command: sh -c './wait-for.sh rabbitmq:15672 -- npm start'
       
   rabbitmq:
     image: "rabbitmq:management"
