@@ -23,10 +23,10 @@ export class OCRService {
       const file: FileUrl = JSON.parse(message);
 
       console.log('Got new message:', file);
-      if (!file.fileUrl) { throw new Error('Wrong request format...'); }
+      if (!file.fileUrl) { return new Error('Wrong request format...'); }
       this.ocrChannel.push(file.fileUrl);
     } catch (error) {
-      console.warn(error);
+      return error;
     }
   }
 
@@ -40,7 +40,8 @@ export class OCRService {
       await tesseractWorker.terminate();
       return text;
     } catch (error) {
-      return error;
+      console.log(error);
+      return new Error('Something wrong...');
     }
   }
 
