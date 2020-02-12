@@ -1,5 +1,16 @@
-
 # OCR_worker_example
+
+## Config example
+``` config/default.json ```:
+```
+{
+  "port": 8080,
+  "rabitMQ": {
+    "url": "amqp://localhost",
+    "OCRqueue": "ocr"
+  }
+}
+```
 
 ## Instruction for use
 
