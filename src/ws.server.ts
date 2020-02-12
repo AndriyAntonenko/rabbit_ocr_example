@@ -22,6 +22,7 @@ export class WSServer {
       ws.on('message', (msg) => { this.onMessage(msg.toString()); } );
     });
     this.wss.on('error', this.onError);
+    return this.wss;
   }
 
   private onMessage(message: string) {
