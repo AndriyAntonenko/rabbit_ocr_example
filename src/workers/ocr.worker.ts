@@ -20,6 +20,10 @@ class OCRWorker {
       .then(text => {
         parentPort.postMessage(text);
         ch.ack(msg);
+      })
+      .catch(err => {
+        parentPort.postMessage(err);
+        ch.ack(msg);
       });
   }
 
